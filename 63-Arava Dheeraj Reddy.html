@@ -1,0 +1,1332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Greenwood Academy</title>
+
+  <!-- Google Fonts: Playfair Display (headings) + DM Sans (body) -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ============================================================
+       CSS VARIABLES — change these to retheme the whole site
+    ============================================================ */
+    :root {
+      --navy:   #0d1b3e;   /* deep navy — main brand colour */
+      --gold:   #c8922a;   /* warm gold — accent */
+      --cream:  #faf7f2;   /* off-white background */
+      --white:  #ffffff;
+      --text:   #2c2c2c;
+      --muted:  #6b7280;
+      --radius: 12px;
+      --shadow: 0 8px 32px rgba(13,27,62,.12);
+    }
+
+    /* ============================================================
+       RESET & BASE
+    ============================================================ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }   /* smooth anchor scrolling */
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--cream);
+      color: var(--text);
+      line-height: 1.7;
+    }
+
+    img { max-width: 100%; display: block; }
+
+    /* ============================================================
+       UTILITY CLASSES
+    ============================================================ */
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    .section-label {          /* small uppercase tag above headings */
+      font-size: .75rem;
+      font-weight: 600;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      color: var(--gold);
+      display: block;
+      margin-bottom: 10px;
+    }
+
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 4vw, 2.8rem);
+      color: var(--navy);
+      line-height: 1.2;
+    }
+
+    /* ============================================================
+       NAVIGATION BAR
+    ============================================================ */
+    #navbar {
+      position: fixed;          /* sticks to top when scrolling */
+      top: 0; left: 0; right: 0;
+      z-index: 1000;
+      background: rgba(13, 27, 62, .97);
+      backdrop-filter: blur(10px);
+      transition: box-shadow .3s;
+    }
+
+    #navbar.scrolled { box-shadow: 0 4px 24px rgba(0,0,0,.3); }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 68px;
+    }
+
+    /* School logo / name in the navbar */
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+
+    .nav-brand .brand-icon {
+      width: 36px; height: 36px;
+      background: var(--gold);
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      font-size: 1.1rem;
+    }
+
+    .nav-brand .brand-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.15rem;
+      color: var(--white);
+      font-weight: 700;
+    }
+
+    /* Desktop navigation links */
+    .nav-links {
+      display: flex;
+      list-style: none;
+      gap: 36px;
+    }
+
+    .nav-links a {
+      color: rgba(255,255,255,.75);
+      text-decoration: none;
+      font-size: .9rem;
+      font-weight: 500;
+      position: relative;
+      padding-bottom: 4px;
+      transition: color .25s;
+    }
+
+    /* Animated underline on hover */
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0;
+      width: 0; height: 2px;
+      background: var(--gold);
+      transition: width .3s ease;
+    }
+
+    .nav-links a:hover { color: var(--white); }
+    .nav-links a:hover::after { width: 100%; }
+
+    /* Hamburger menu (mobile) */
+    .hamburger {
+      display: none;            /* hidden on desktop */
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 4px;
+    }
+
+    .hamburger span {
+      display: block;
+      width: 24px; height: 2px;
+      background: var(--white);
+      border-radius: 2px;
+      transition: transform .3s, opacity .3s;
+    }
+
+    /* Hamburger → X animation when menu is open */
+    .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    /* Mobile drawer */
+    .mobile-menu {
+      display: none;
+      flex-direction: column;
+      gap: 0;
+      background: var(--navy);
+      overflow: hidden;
+      max-height: 0;
+      transition: max-height .4s ease;
+    }
+
+    .mobile-menu.open { max-height: 300px; }
+
+    .mobile-menu a {
+      color: rgba(255,255,255,.8);
+      text-decoration: none;
+      padding: 14px 24px;
+      font-size: .95rem;
+      border-top: 1px solid rgba(255,255,255,.07);
+      transition: background .2s;
+    }
+
+    .mobile-menu a:hover { background: rgba(255,255,255,.06); color: var(--white); }
+
+    /* ============================================================
+       HERO / HOME SECTION
+    ============================================================ */
+    #home {
+      padding-top: 68px;        /* offset for fixed navbar */
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      background:
+        linear-gradient(135deg, rgba(13,27,62,.88) 0%, rgba(13,27,62,.65) 100%),
+        url('https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=1600&q=80') center/cover no-repeat;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* decorative circle behind headline */
+    #home::before {
+      content: '';
+      position: absolute;
+      width: 600px; height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(200,146,42,.18) 0%, transparent 70%);
+      top: -100px; right: -100px;
+      pointer-events: none;
+    }
+
+    .hero-content { position: relative; z-index: 1; max-width: 640px; }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(200,146,42,.2);
+      border: 1px solid rgba(200,146,42,.4);
+      color: #e8b96a;
+      font-size: .78rem;
+      font-weight: 600;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      border-radius: 50px;
+      margin-bottom: 24px;
+      animation: fadeDown .8s ease both;
+    }
+
+    .hero-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.4rem, 6vw, 4rem);
+      color: var(--white);
+      line-height: 1.1;
+      margin-bottom: 20px;
+      animation: fadeUp .8s .15s ease both;
+    }
+
+    .hero-title span { color: var(--gold); }
+
+    .hero-desc {
+      color: rgba(255,255,255,.75);
+      font-size: 1.05rem;
+      margin-bottom: 36px;
+      animation: fadeUp .8s .3s ease both;
+    }
+
+    .hero-buttons {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      animation: fadeUp .8s .45s ease both;
+    }
+
+    /* Primary button */
+    .btn-primary {
+      background: var(--gold);
+      color: var(--white);
+      border: none;
+      padding: 14px 30px;
+      border-radius: var(--radius);
+      font-size: .95rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      transition: background .25s, transform .2s, box-shadow .25s;
+      box-shadow: 0 4px 18px rgba(200,146,42,.4);
+    }
+
+    .btn-primary:hover {
+      background: #b07c1e;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(200,146,42,.5);
+    }
+
+    /* Ghost / outline button */
+    .btn-outline {
+      background: transparent;
+      color: var(--white);
+      border: 2px solid rgba(255,255,255,.5);
+      padding: 12px 28px;
+      border-radius: var(--radius);
+      font-size: .95rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      transition: border-color .25s, background .25s, transform .2s;
+    }
+
+    .btn-outline:hover {
+      border-color: var(--white);
+      background: rgba(255,255,255,.08);
+      transform: translateY(-2px);
+    }
+
+    /* Scroll-down arrow at bottom of hero */
+    .scroll-hint {
+      position: absolute;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      color: rgba(255,255,255,.5);
+      font-size: .72rem;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      animation: bounce 2s infinite;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .scroll-hint svg { width: 20px; height: 20px; }
+
+    /* ============================================================
+       STATS STRIP
+    ============================================================ */
+    .stats-strip {
+      background: var(--navy);
+      padding: 32px 0;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 16px;
+      text-align: center;
+    }
+
+    .stat-item .stat-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.2rem;
+      color: var(--gold);
+      display: block;
+    }
+
+    .stat-item .stat-label {
+      font-size: .8rem;
+      color: rgba(255,255,255,.6);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    /* ============================================================
+       ABOUT SECTION
+    ============================================================ */
+    #about {
+      padding: 100px 0;
+      background: var(--white);
+    }
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 64px;
+      align-items: center;
+    }
+
+    .about-img-wrap {
+      position: relative;
+    }
+
+    .about-img-wrap img {
+      border-radius: var(--radius);
+      width: 100%;
+      aspect-ratio: 4/3;
+      object-fit: cover;
+    }
+
+    /* decorative gold badge overlapping the photo */
+    .about-badge {
+      position: absolute;
+      bottom: -20px;
+      right: -20px;
+      background: var(--gold);
+      color: var(--white);
+      width: 100px; height: 100px;
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Playfair Display', serif;
+      box-shadow: var(--shadow);
+    }
+
+    .about-badge .big { font-size: 1.6rem; line-height: 1; }
+    .about-badge .small { font-size: .65rem; text-align: center; line-height: 1.3; }
+
+    .about-text .section-title { margin-bottom: 18px; }
+
+    .about-text p {
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+
+    /* Feature list under about text */
+    .feature-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 24px;
+    }
+
+    .feature-list li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: .92rem;
+      color: var(--text);
+    }
+
+    .feature-list li .check {
+      width: 22px; height: 22px;
+      background: rgba(200,146,42,.15);
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+      color: var(--gold);
+      font-size: .75rem;
+    }
+
+    /* ============================================================
+       COURSES SECTION
+    ============================================================ */
+    #courses {
+      padding: 100px 0;
+      background: var(--cream);
+    }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: 56px;
+    }
+
+    .section-header p {
+      color: var(--muted);
+      max-width: 520px;
+      margin: 12px auto 0;
+    }
+
+    .courses-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 28px;
+    }
+
+    /* Individual course card */
+    .course-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: 0 2px 16px rgba(0,0,0,.07);
+      transition: transform .3s, box-shadow .3s;
+      cursor: default;
+    }
+
+    .course-card:hover {
+      transform: translateY(-6px);
+      box-shadow: var(--shadow);
+    }
+
+    .card-thumb {
+      height: 180px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card-body { padding: 24px; }
+
+    .card-tag {
+      font-size: .7rem;
+      font-weight: 600;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 8px;
+    }
+
+    .card-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem;
+      color: var(--navy);
+      margin-bottom: 10px;
+    }
+
+    .card-desc {
+      font-size: .88rem;
+      color: var(--muted);
+      line-height: 1.6;
+      margin-bottom: 18px;
+    }
+
+    .card-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: .8rem;
+      color: var(--muted);
+      border-top: 1px solid #eee;
+      padding-top: 14px;
+    }
+
+    /* ============================================================
+       CONTACT SECTION
+    ============================================================ */
+    #contact {
+      padding: 100px 0;
+      background: var(--navy);
+    }
+
+    #contact .section-title { color: var(--white); }
+
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.4fr;
+      gap: 64px;
+      align-items: start;
+    }
+
+    .contact-info h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      color: var(--white);
+      margin-bottom: 16px;
+    }
+
+    .contact-info p {
+      color: rgba(255,255,255,.6);
+      font-size: .92rem;
+      margin-bottom: 28px;
+    }
+
+    .info-list { list-style: none; display: flex; flex-direction: column; gap: 16px; }
+
+    .info-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      color: rgba(255,255,255,.75);
+      font-size: .9rem;
+    }
+
+    .info-list .ico {
+      background: rgba(200,146,42,.2);
+      color: var(--gold);
+      width: 36px; height: 36px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+      font-size: 1rem;
+    }
+
+    /* Contact form card */
+    .contact-form-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 36px;
+      box-shadow: var(--shadow);
+    }
+
+    .form-group { margin-bottom: 20px; }
+
+    .form-group label {
+      display: block;
+      font-size: .84rem;
+      font-weight: 600;
+      color: var(--navy);
+      margin-bottom: 8px;
+    }
+
+    /* Input + textarea shared style */
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: .9rem;
+      color: var(--text);
+      background: #fafafa;
+      transition: border-color .25s, box-shadow .25s;
+      outline: none;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 4px rgba(200,146,42,.12);
+      background: var(--white);
+    }
+
+    .form-group textarea { resize: vertical; min-height: 120px; }
+
+    /* Error message beneath a field */
+    .error-msg {
+      font-size: .78rem;
+      color: #e53e3e;
+      margin-top: 5px;
+      display: none;       /* shown via JS on validation fail */
+    }
+
+    /* ============================================================
+       FOOTER
+    ============================================================ */
+    footer {
+      background: #080f22;
+      padding: 28px 0;
+      text-align: center;
+      color: rgba(255,255,255,.35);
+      font-size: .82rem;
+    }
+
+    footer span { color: var(--gold); }
+
+    /* ============================================================
+       WELCOME TOAST (JavaScript-triggered popup)
+    ============================================================ */
+    #welcome-toast {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      background: var(--navy);
+      color: var(--white);
+      padding: 16px 22px;
+      border-radius: var(--radius);
+      font-size: .9rem;
+      box-shadow: 0 8px 32px rgba(0,0,0,.3);
+      border-left: 4px solid var(--gold);
+      display: none;          /* shown via JS */
+      align-items: center;
+      gap: 12px;
+      z-index: 9999;
+      animation: slideInRight .4s ease;
+      max-width: 320px;
+    }
+
+    #welcome-toast .toast-icon { font-size: 1.4rem; }
+
+    /* Success banner shown after form submission */
+    #form-success {
+      display: none;
+      background: #f0fdf4;
+      border: 1px solid #86efac;
+      color: #166534;
+      padding: 14px 18px;
+      border-radius: 8px;
+      font-size: .9rem;
+      margin-top: 16px;
+      text-align: center;
+    }
+
+    /* ============================================================
+       ANIMATIONS
+    ============================================================ */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50%       { transform: translateX(-50%) translateY(8px); }
+    }
+
+    @keyframes slideInRight {
+      from { opacity: 0; transform: translateX(40px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+
+    /* Fade-in on scroll (added via JS IntersectionObserver) */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity .7s ease, transform .7s ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ============================================================
+       RESPONSIVE — MOBILE BREAKPOINT (≤ 768px)
+    ============================================================ */
+    @media (max-width: 768px) {
+
+      /* Show hamburger, hide desktop links */
+      .hamburger { display: flex; }
+      .nav-links  { display: none; }
+      .mobile-menu { display: flex; }
+
+      /* Stack about layout */
+      .about-grid {
+        grid-template-columns: 1fr;
+        gap: 48px;
+      }
+
+      .about-badge { right: 8px; bottom: 8px; }
+
+      /* Stack contact layout */
+      .contact-grid {
+        grid-template-columns: 1fr;
+        gap: 40px;
+      }
+
+      .contact-form-card { padding: 24px; }
+
+      /* Stack hero buttons */
+      .hero-buttons { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ============================================================
+       NAVIGATION BAR
+  ============================================================ -->
+  <nav id="navbar" role="navigation" aria-label="Main navigation">
+    <div class="container nav-inner">
+
+      <!-- Brand / logo -->
+      <a href="#home" class="nav-brand" aria-label="Greenwood Academy Home">
+        <div class="brand-icon">🎓</div>
+        <span class="brand-name">Greenwood Academy</span>
+      </a>
+
+      <!-- Desktop links -->
+      <ul class="nav-links" role="list">
+        <li><a href="#home">Home</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#courses">Courses</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+
+      <!-- Hamburger button (mobile only) -->
+      <button class="hamburger" id="hamburgerBtn" aria-label="Toggle mobile menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+
+    </div>
+
+    <!-- Mobile sliding menu -->
+    <nav class="mobile-menu" id="mobileMenu" aria-label="Mobile navigation">
+      <a href="#home"    onclick="closeMobileMenu()">Home</a>
+      <a href="#about"   onclick="closeMobileMenu()">About</a>
+      <a href="#courses" onclick="closeMobileMenu()">Courses</a>
+      <a href="#contact" onclick="closeMobileMenu()">Contact</a>
+    </nav>
+  </nav>
+
+  <!-- ============================================================
+       HOME / HERO SECTION
+  ============================================================ -->
+  <section id="home" role="main">
+    <div class="container">
+      <div class="hero-content">
+
+        <!-- Small badge tag -->
+        <span class="hero-badge">🏆 Ranked #1 in the District 2024</span>
+
+        <!-- Main headline -->
+        <h1 class="hero-title">
+          Shaping <span>Brilliant</span><br>Minds for Tomorrow
+        </h1>
+
+        <!-- Sub-description -->
+        <p class="hero-desc">
+          Greenwood Academy offers a world-class education in a nurturing environment,
+          empowering students to achieve their fullest potential.
+        </p>
+
+        <!-- Call-to-action buttons -->
+        <div class="hero-buttons">
+          <a href="#courses" class="btn-primary">Explore Courses</a>
+
+          <!-- This button triggers the JavaScript welcome message -->
+          <button class="btn-outline" onclick="showWelcomeToast()">
+            Welcome Message 👋
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Scroll-down indicator -->
+    <a href="#about" class="scroll-hint" aria-label="Scroll to About section">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+      </svg>
+      Scroll
+    </a>
+  </section>
+
+  <!-- ============================================================
+       STATS STRIP — quick numbers at a glance
+  ============================================================ -->
+  <div class="stats-strip">
+    <div class="container">
+      <div class="stats-grid">
+        <div class="stat-item reveal">
+          <span class="stat-num">25+</span>
+          <span class="stat-label">Years of Excellence</span>
+        </div>
+        <div class="stat-item reveal">
+          <span class="stat-num">3,400</span>
+          <span class="stat-label">Happy Students</span>
+        </div>
+        <div class="stat-item reveal">
+          <span class="stat-num">120</span>
+          <span class="stat-label">Expert Teachers</span>
+        </div>
+        <div class="stat-item reveal">
+          <span class="stat-num">98%</span>
+          <span class="stat-label">Pass Rate</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       ABOUT SECTION
+  ============================================================ -->
+  <section id="about">
+    <div class="container">
+      <div class="about-grid">
+
+        <!-- Left: photo -->
+        <div class="about-img-wrap reveal">
+          <img
+            src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=800&q=80"
+            alt="Students studying together at Greenwood Academy"
+            loading="lazy"
+          />
+          <!-- Gold badge overlapping the photo -->
+          <div class="about-badge">
+            <span class="big">A+</span>
+            <span class="small">Accredited School</span>
+          </div>
+        </div>
+
+        <!-- Right: text -->
+        <div class="about-text reveal">
+          <span class="section-label">About Us</span>
+          <h2 class="section-title">A Legacy of Learning Since 1999</h2>
+
+          <p>
+            Greenwood Academy was founded with a single purpose: to create an inspiring
+            learning environment where every student can discover their strengths, build
+            critical thinking skills, and grow into confident individuals.
+          </p>
+          <p>
+            We combine a rigorous academic curriculum with a broad range of co-curricular
+            activities — arts, sports, technology, and community service — to develop
+            well-rounded students ready for the challenges of the modern world.
+          </p>
+
+          <!-- Feature checklist -->
+          <ul class="feature-list" role="list">
+            <li>
+              <span class="check" aria-hidden="true">✓</span>
+              CBSE-affiliated with state-of-the-art infrastructure
+            </li>
+            <li>
+              <span class="check" aria-hidden="true">✓</span>
+              Smart classrooms and a fully-equipped science lab
+            </li>
+            <li>
+              <span class="check" aria-hidden="true">✓</span>
+              Dedicated counsellors and mental-health support
+            </li>
+            <li>
+              <span class="check" aria-hidden="true">✓</span>
+              Annual sports meet, cultural fest, and hackathons
+            </li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       COURSES SECTION
+  ============================================================ -->
+  <section id="courses">
+    <div class="container">
+
+      <div class="section-header reveal">
+        <span class="section-label">What We Offer</span>
+        <h2 class="section-title">Our Courses & Programmes</h2>
+        <p>
+          From foundational sciences to cutting-edge technology, our curriculum is
+          designed to nurture curiosity and build expertise.
+        </p>
+      </div>
+
+      <!-- Course cards grid -->
+      <div class="courses-grid">
+
+        <!-- Card 1: Science -->
+        <article class="course-card reveal">
+          <div class="card-thumb" style="background: linear-gradient(135deg,#e0f2fe,#bae6fd);">
+            🔬
+          </div>
+          <div class="card-body">
+            <p class="card-tag">Grade 9–12</p>
+            <h3 class="card-title">Science & Technology</h3>
+            <p class="card-desc">
+              Hands-on experiments in Physics, Chemistry, and Biology backed by
+              modern lab facilities. Prepares students for competitive engineering and
+              medical entrance examinations.
+            </p>
+            <div class="card-meta">
+              <span>⏱ 3-year programme</span>
+              <span>👩‍🏫 18 teachers</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Card 2: Mathematics -->
+        <article class="course-card reveal">
+          <div class="card-thumb" style="background: linear-gradient(135deg,#fef9c3,#fde68a);">
+            📐
+          </div>
+          <div class="card-body">
+            <p class="card-tag">Grade 6–12</p>
+            <h3 class="card-title">Mathematics & Logic</h3>
+            <p class="card-desc">
+              From arithmetic foundations to advanced calculus and statistics — our
+              maths programme builds analytical thinking, problem-solving, and a love
+              for numbers.
+            </p>
+            <div class="card-meta">
+              <span>⏱ 7-year programme</span>
+              <span>👩‍🏫 12 teachers</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Card 3: Computer Science -->
+        <article class="course-card reveal">
+          <div class="card-thumb" style="background: linear-gradient(135deg,#f0fdf4,#bbf7d0);">
+            💻
+          </div>
+          <div class="card-body">
+            <p class="card-tag">Grade 8–12</p>
+            <h3 class="card-title">Computer Science</h3>
+            <p class="card-desc">
+              Scratch and block coding for beginners, Python and C for intermediates,
+              all the way to web development, databases, and AI basics for senior
+              students.
+            </p>
+            <div class="card-meta">
+              <span>⏱ 5-year programme</span>
+              <span>👩‍🏫 10 teachers</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Card 4: Commerce -->
+        <article class="course-card reveal">
+          <div class="card-thumb" style="background: linear-gradient(135deg,#fdf4ff,#e9d5ff);">
+            📊
+          </div>
+          <div class="card-body">
+            <p class="card-tag">Grade 11–12</p>
+            <h3 class="card-title">Commerce & Economics</h3>
+            <p class="card-desc">
+              Accountancy, Business Studies, and Economics — taught with real-world
+              case studies and industry visits. Ideal foundation for CA, MBA, and
+              Finance careers.
+            </p>
+            <div class="card-meta">
+              <span>⏱ 2-year programme</span>
+              <span>👩‍🏫 8 teachers</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Card 5: Arts & Humanities -->
+        <article class="course-card reveal">
+          <div class="card-thumb" style="background: linear-gradient(135deg,#fff7ed,#fed7aa);">
+            🎨
+          </div>
+          <div class="card-body">
+            <p class="card-tag">Grade 1–12</p>
+            <h3 class="card-title">Arts & Humanities</h3>
+            <p class="card-desc">
+              Language arts, History, Geography, Civics, and Fine Arts. Develops
+              communication, creativity, and cultural awareness — skills every
+              professional needs.
+            </p>
+            <div class="card-meta">
+              <span>⏱ 12-year programme</span>
+              <span>👩‍🏫 22 teachers</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Card 6: Sports -->
+        <article class="course-card reveal">
+          <div class="card-thumb" style="background: linear-gradient(135deg,#fef2f2,#fecaca);">
+            ⚽
+          </div>
+          <div class="card-body">
+            <p class="card-tag">All Grades</p>
+            <h3 class="card-title">Sports & Physical Education</h3>
+            <p class="card-desc">
+              Cricket, football, badminton, athletics, swimming, chess, and yoga.
+              Certified coaches, regular inter-school tournaments, and district-level
+              competition preparation.
+            </p>
+            <div class="card-meta">
+              <span>⏱ Year-round</span>
+              <span>🏅 District champions</span>
+            </div>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       CONTACT SECTION
+  ============================================================ -->
+  <section id="contact">
+    <div class="container">
+
+      <div class="section-header reveal" style="text-align:left; margin-bottom:48px;">
+        <span class="section-label">Get In Touch</span>
+        <h2 class="section-title" style="color:var(--white);">We'd Love to Hear From You</h2>
+      </div>
+
+      <div class="contact-grid">
+
+        <!-- Left: contact info -->
+        <div class="contact-info reveal">
+          <h3>Visit or Call Us</h3>
+          <p>
+            Have questions about admissions, fees, or our programmes?
+            Fill in the form and our team will respond within 24 hours.
+          </p>
+
+          <ul class="info-list" role="list">
+            <li>
+              <span class="ico" aria-hidden="true">📍</span>
+              <span>14-B, School Road, Model Town,<br>Ludhiana, Punjab — 141002</span>
+            </li>
+            <li>
+              <span class="ico" aria-hidden="true">📞</span>
+              <span>+91 98765 43210</span>
+            </li>
+            <li>
+              <span class="ico" aria-hidden="true">✉️</span>
+              <span>info@greenwoodacademy.edu.in</span>
+            </li>
+            <li>
+              <span class="ico" aria-hidden="true">🕘</span>
+              <span>Mon – Sat: 8:00 AM – 5:00 PM</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Right: contact form -->
+        <div class="contact-form-card reveal">
+
+          <!-- The novalidate disables browser's built-in validation (we handle it with JS) -->
+          <form id="contactForm" novalidate>
+
+            <!-- Name field -->
+            <div class="form-group">
+              <label for="name">Full Name *</label>
+              <input
+                type="text"
+                id="name"
+                name="name"
+                placeholder="e.g. Rahul Sharma"
+                autocomplete="name"
+              />
+              <p class="error-msg" id="nameError">Please enter your full name.</p>
+            </div>
+
+            <!-- Email field -->
+            <div class="form-group">
+              <label for="email">Email Address *</label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                placeholder="you@example.com"
+                autocomplete="email"
+              />
+              <p class="error-msg" id="emailError">Please enter a valid email address.</p>
+            </div>
+
+            <!-- Message field -->
+            <div class="form-group">
+              <label for="message">Your Message *</label>
+              <textarea
+                id="message"
+                name="message"
+                placeholder="Ask about admissions, courses, fees…"
+              ></textarea>
+              <p class="error-msg" id="messageError">Please write your message.</p>
+            </div>
+
+            <!-- Submit button -->
+            <button type="submit" class="btn-primary" style="width:100%;justify-content:center;">
+              Send Message →
+            </button>
+
+          </form>
+
+          <!-- Success banner (hidden until form submits successfully) -->
+          <div id="form-success" role="alert">
+            ✅ Thank you! Your message has been sent. We'll get back to you within 24 hours.
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       FOOTER
+  ============================================================ -->
+  <footer>
+    <div class="container">
+      <p>
+        © 2024 <span>Greenwood Academy</span> — All rights reserved.
+        Built with ❤️ for students everywhere.
+      </p>
+    </div>
+  </footer>
+
+  <!-- ============================================================
+       WELCOME TOAST (shown on button click)
+  ============================================================ -->
+  <div id="welcome-toast" role="status" aria-live="polite">
+    <span class="toast-icon">🎓</span>
+    <div>
+      <strong>Welcome to Greenwood Academy!</strong><br>
+      <small>We're glad you're here.</small>
+    </div>
+  </div>
+
+
+  <!-- ============================================================
+       JAVASCRIPT
+  ============================================================ -->
+  <script>
+
+    /* ----------------------------------------------------------
+       1. NAVBAR — add shadow when user scrolls down
+    ---------------------------------------------------------- */
+    const navbar = document.getElementById('navbar');
+
+    window.addEventListener('scroll', () => {
+      // Add 'scrolled' class after 20px of scrolling
+      navbar.classList.toggle('scrolled', window.scrollY > 20);
+    });
+
+
+    /* ----------------------------------------------------------
+       2. MOBILE HAMBURGER MENU
+    ---------------------------------------------------------- */
+    const hamburgerBtn = document.getElementById('hamburgerBtn');
+    const mobileMenu   = document.getElementById('mobileMenu');
+
+    hamburgerBtn.addEventListener('click', () => {
+      const isOpen = mobileMenu.classList.toggle('open');    // toggle open state
+      hamburgerBtn.classList.toggle('open', isOpen);         // animate icon → X
+      hamburgerBtn.setAttribute('aria-expanded', isOpen);    // accessibility
+    });
+
+    // Close mobile menu when a link is clicked
+    function closeMobileMenu() {
+      mobileMenu.classList.remove('open');
+      hamburgerBtn.classList.remove('open');
+      hamburgerBtn.setAttribute('aria-expanded', 'false');
+    }
+
+
+    /* ----------------------------------------------------------
+       3. SCROLL-REVEAL — fade elements into view as you scroll
+    ---------------------------------------------------------- */
+    const revealObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');    // triggers CSS transition
+            revealObserver.unobserve(entry.target);   // only animate once
+          }
+        });
+      },
+      { threshold: 0.15 }   // trigger when 15% of the element is visible
+    );
+
+    // Attach observer to every element with class 'reveal'
+    document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+
+    /* ----------------------------------------------------------
+       4. WELCOME TOAST — interactive feature triggered by button
+    ---------------------------------------------------------- */
+    const toast = document.getElementById('welcome-toast');
+    let toastTimeout;
+
+    function showWelcomeToast() {
+      clearTimeout(toastTimeout);        // reset any pending hide timer
+
+      toast.style.display = 'flex';     // make it visible
+      toast.style.animation = 'none';   // reset animation
+      void toast.offsetHeight;          // force browser reflow (trick)
+      toast.style.animation = 'slideInRight .4s ease';  // replay animation
+
+      // Auto-hide after 3 seconds
+      toastTimeout = setTimeout(() => {
+        toast.style.display = 'none';
+      }, 3000);
+    }
+
+
+    /* ----------------------------------------------------------
+       5. CONTACT FORM VALIDATION
+    ---------------------------------------------------------- */
+
+    // Helper: show an error message under a field
+    function showError(fieldId, errorId) {
+      document.getElementById(errorId).style.display = 'block';
+      document.getElementById(fieldId).style.borderColor = '#e53e3e';
+    }
+
+    // Helper: clear an error message under a field
+    function clearError(fieldId, errorId) {
+      document.getElementById(errorId).style.display = 'none';
+      document.getElementById(fieldId).style.borderColor = '';
+    }
+
+    // Helper: validate email format using a regular expression
+    function isValidEmail(email) {
+      // Basic regex — checks for something@something.something
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+
+    // Listen for form submission
+    document.getElementById('contactForm').addEventListener('submit', function(event) {
+      event.preventDefault();   // stop the page from reloading
+
+      // Read field values (trim removes leading/trailing whitespace)
+      const name    = document.getElementById('name').value.trim();
+      const email   = document.getElementById('email').value.trim();
+      const message = document.getElementById('message').value.trim();
+
+      let isValid = true;   // assume form is valid; flip to false on any error
+
+      // --- Validate Name ---
+      if (name === '') {
+        showError('name', 'nameError');
+        isValid = false;
+      } else {
+        clearError('name', 'nameError');
+      }
+
+      // --- Validate Email ---
+      if (email === '' || !isValidEmail(email)) {
+        showError('email', 'emailError');
+        isValid = false;
+      } else {
+        clearError('email', 'emailError');
+      }
+
+      // --- Validate Message ---
+      if (message === '') {
+        showError('message', 'messageError');
+        isValid = false;
+      } else {
+        clearError('message', 'messageError');
+      }
+
+      // --- If all valid, show success ---
+      if (isValid) {
+        // Hide the form fields and show the success message
+        document.getElementById('contactForm').style.display = 'none';
+        document.getElementById('form-success').style.display = 'block';
+
+        // Optional: also show an alert (classic JS popup)
+        alert('✅ Message sent! Thank you, ' + name + '. We will contact you soon.');
+      }
+    });
+
+    // Clear errors when the user starts re-typing in a field
+    ['name', 'email', 'message'].forEach(id => {
+      document.getElementById(id).addEventListener('input', () => {
+        const errorEl = document.getElementById(id + 'Error');
+        if (errorEl) {
+          errorEl.style.display = 'none';
+          document.getElementById(id).style.borderColor = '';
+        }
+      });
+    });
+
+  </script>
+
+</body>
+</html>
